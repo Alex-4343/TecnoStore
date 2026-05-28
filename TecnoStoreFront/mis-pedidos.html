@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos – TecnoStore</title>
+    <meta name="description" content="Consulta el historial completo de tus compras en TecnoStore.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Estilos compartidos -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fb;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ── Page hero ── */
+        .page-hero {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: #fff;
+            padding: 40px 40px 60px;
+        }
+
+        .page-hero h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .page-hero p { font-size: .95rem; opacity: .85; }
+
+        /* ── Contenido principal ── */
+        .orders-wrapper {
+            max-width: 860px;
+            margin: -28px auto 50px;
+            padding: 0 20px;
+        }
+
+        /* ── Estado de carga / vacío / error ── */
+        .state-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.07);
+            padding: 60px 30px;
+            text-align: center;
+            color: #999;
+        }
+
+        .state-card i { font-size: 3.2rem; margin-bottom: 18px; display: block; }
+        .state-card h3 { font-size: 1.2rem; color: #555; margin-bottom: 8px; }
+        .state-card p  { font-size: .9rem; margin-bottom: 22px; }
+
+        .state-card a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #007bff;
+            color: #fff;
+            padding: 11px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem;
+            transition: background .2s;
+        }
+
+        .state-card a:hover { background: #0056b3; }
+
+        /* Spinner */
+        .spinner-ring {
+            width: 48px; height: 48px;
+            border: 4px solid #e0e7ff;
+            border-top-color: #007bff;
+            border-radius: 50%;
+            animation: spin .75s linear infinite;
+            margin: 0 auto 18px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Tarjeta de pedido ── */
+        .order-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,.07);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: box-shadow .2s;
+        }
+
+        .order-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.11); }
+
+        /* Header de la card */
+        .order-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .order-id {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .order-meta {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .82rem;
+            color: #888;
+        }
+
+        .order-meta i { font-size: .75rem; }
+
+        /* Badges de estado */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .3px;
+        }
+
+        .badge-pagado      { background: #e8f9ee; color: #1a8a3f; }
+        .badge-pendiente   { background: #fff8e1; color: #b78a00; }
+        .badge-procesando  { background: #e8f0fe; color: #2b6cb0; }
+        .badge-enviado     { background: #e8f4ff; color: #005a9e; }
+        .badge-entregado   { background: #edf9f0; color: #1a6b37; }
+        .badge-cancelado   { background: #ffeaea; color: #c0392b; }
+
+        /* Banner de envío */
+        .envio-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: linear-gradient(135deg, #e8f9ee, #d4f5e0);
+            border: 1px solid #a8e6be;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            font-size: .85rem;
+            color: #1a5c30;
+        }
+        .envio-banner i { font-size: 1.4rem; margin-top: 1px; flex-shrink: 0; }
+        .envio-banner strong { display: block; margin-bottom: 3px; font-size: .9rem; }
+
+        /* Banner de pago pendiente */
+        .pendiente-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            font-size: .85rem;
+            color: #6b5300;
+        }
+        .pendiente-banner i { font-size: 1.3rem; margin-top: 1px; flex-shrink: 0; }
+        .pendiente-banner strong { display: block; margin-bottom: 3px; }
+        .metodo-info { font-size:.8rem; color:#aaa; margin-bottom:10px; }
+
+        .order-total {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .btn-toggle {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: .9rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-toggle:hover { background: #f0f4ff; color: #007bff; }
+        .btn-toggle i     { transition: transform .25s ease; }
+        .btn-toggle.open i { transform: rotate(180deg); }
+
+        /* Detalles expandibles */
+        .order-details {
+            border-top: 1px solid #f0f0f0;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height .35s ease;
+        }
+
+        .order-details.open { max-height: 1200px; }
+
+        .details-inner { padding: 0 24px 20px; }
+
+        /* Tabla de productos */
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 14px;
+            font-size: .875rem;
+        }
+
+        .products-table th {
+            text-align: left;
+            padding: 8px 10px;
+            color: #888;
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .products-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #fafafa;
+            vertical-align: middle;
+        }
+
+        .products-table tr:last-child td { border-bottom: none; }
+
+        .product-thumb {
+            width: 44px;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .product-name-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        .subtotal-row {
+            background: #f8faff;
+        }
+
+        .subtotal-row td {
+            padding: 14px 10px;
+            font-weight: 700;
+            color: #007bff;
+            font-size: .95rem;
+        }
+
+        /* ── Resumen stats ── */
+        .summary-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .summary-stat {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 22px;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .summary-stat .label {
+            font-size: .75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+        }
+
+        .summary-stat .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #333;
+        }
+
+        .summary-stat .value.blue { color: #007bff; }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .page-hero { padding: 30px 20px 50px; }
+            .order-header { padding: 14px 16px; }
+            .details-inner { padding: 0 16px 16px; }
+            .products-table { font-size: .8rem; }
+            .product-thumb { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ HEADER (idéntico al de index.html) ══════════════════════ -->
+<header class="site-header">
+    <div class="top-bar">
+        <p>Compra <strong>con nosotros</strong> para más seguridad</p>
+    </div>
+    <div class="main-header">
+        <div class="logo">
+            <h2><a href="index.html" style="text-decoration:none;color:inherit">TECNO<span class="logo-accent">STORE</span></a></h2>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="index.html">Tienda</a></li>
+                <li><a href="https://wa.me/573000000000" target="_blank" title="Chatea con nosotros">Contáctanos</a></li>
+            </ul>
+        </nav>
+        <div class="header-actions">
+            <div class="user-icons">
+                <a href="login.html" title="Mi Cuenta"><i class="far fa-user"></i></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ══ HERO ════════════════════════════════════════════════════ -->
+<div class="page-hero">
+    <div style="max-width:860px;margin:0 auto;padding:0 20px">
+        <h1><i class="fas fa-box-open" style="margin-right:10px"></i>Mis Pedidos</h1>
+        <p>Consulta el historial completo de tus compras</p>
+    </div>
+</div>
+
+<!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════════════ -->
+<main class="orders-wrapper">
+
+    <!-- Stats resumen -->
+    <div class="summary-bar" id="summary-bar" style="display:none">
+        <div class="summary-stat">
+            <div class="label">Total pedidos</div>
+            <div class="value blue" id="stat-total">0</div>
+        </div>
+        <div class="summary-stat">
+            <div class="label">Pagados</div>
+            <div class="value" id="stat-pagados">0</div>
+        </div>
+        <div class="summary-stat">
+            <div class="label">Invertido</div>
+            <div class="value" id="stat-invertido">$0</div>
+        </div>
+    </div>
+
+    <!-- Lista de pedidos -->
+    <div id="orders-container">
+        <!-- Estado inicial: cargando -->
+        <div class="state-card" id="state-loading">
+            <div class="spinner-ring"></div>
+            <h3>Cargando tus pedidos...</h3>
+        </div>
+    </div>
+
+</main>
+
+<script type="module">
+    import { getUsuario, estaLogueado, actualizarHeaderAuth } from './js/modules/auth.js';
+
+    const BASE_URL = 'http://localhost:3000/api';
+
+    // ── Formatear precio ─────────────────────────────────────────
+    const fmt = (n) => new Intl.NumberFormat('es-CO', {
+        style: 'currency', currency: 'COP', minimumFractionDigits: 0
+    }).format(n);
+
+    // ── Formatear fecha ──────────────────────────────────────────
+    const fmtFecha = (raw) => {
+        if (!raw) return '—';
+        return new Date(raw).toLocaleDateString('es-CO', {
+            year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    };
+
+    // ── Badge de estado ──────────────────────────────────────────
+    const badgeInfo = {
+        pagado:     { icon: 'fa-check-circle',  label: 'Pagado' },
+        pendiente:  { icon: 'fa-clock',         label: 'Pendiente' },
+        procesando: { icon: 'fa-cog',           label: 'Procesando' },
+        enviado:    { icon: 'fa-truck',         label: 'Enviado' },
+        entregado:  { icon: 'fa-box-open',      label: 'Entregado' },
+        cancelado:  { icon: 'fa-times-circle',  label: 'Cancelado' },
+    };
+
+    const renderBadge = (estado) => {
+        const est = (estado || 'pendiente').toLowerCase();
+        const info = badgeInfo[est] || { icon: 'fa-circle', label: est };
+        return `<span class="badge badge-${est}">
+                    <i class="fas ${info.icon}"></i>${info.label}
+                </span>`;
+    };
+
+    // ── Render tabla de detalles ─────────────────────────────────
+    const renderDetalles = (detalles) => {
+        if (!detalles || detalles.length === 0) {
+            return '<p style="color:#aaa;padding:12px 0;font-size:.875rem">Sin detalles registrados.</p>';
+        }
+
+        const localImages = {
+            'Portátil Lenovo V14': 'assets/images/lenovo-v14.jpg',
+            'Portátil HP Victus Gaming': 'assets/images/hp-victus.jpg',
+            'PC Gamer Armado': 'assets/images/pc-gamer.jpg',
+            'Mouse Logitech G203': 'assets/images/mouse-logitech.jpg',
+            'Teclado Mecánico Redragon Kumara': 'assets/images/teclado-redragon.jpg'
+        };
+
+        const rows = detalles.map(d => {
+            const sub = d.cantidad * d.precio_unitario;
+            
+            const fallbackImage = localImages[d.producto_nombre] || 'assets/images/lenovo-v14.jpg';
+            const rawImageUrl = d.imagen_url && d.imagen_url.trim() !== '' ? d.imagen_url.trim() : '';
+            const normalizedImageUrl = rawImageUrl.startsWith('/') ? rawImageUrl.slice(1) : rawImageUrl;
+            const img = normalizedImageUrl !== '' ? normalizedImageUrl : fallbackImage;
+
+            return `
+                <tr>
+                    <td>
+                        <div class="product-name-cell">
+                            <img src="${img}" alt="${d.producto_nombre}"
+                                 class="product-thumb"
+                                 onerror="this.onerror=null;this.src='${fallbackImage}';">
+                            <span>${d.producto_nombre}</span>
+                        </div>
+                    </td>
+                    <td style="text-align:center">${d.cantidad}</td>
+                    <td style="text-align:right">${fmt(d.precio_unitario)}</td>
+                    <td style="text-align:right;font-weight:600">${fmt(sub)}</td>
+                </tr>
+            `;
+        }).join('');
+
+        const totalDetalles = detalles.reduce((s, d) => s + d.cantidad * d.precio_unitario, 0);
+
+        return `
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th style="text-align:center">Cant.</th>
+                        <th style="text-align:right">Precio unit.</th>
+                        <th style="text-align:right">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                    <tr class="subtotal-row">
+                        <td colspan="3" style="text-align:right">Total del pedido:</td>
+                        <td style="text-align:right">${fmt(totalDetalles)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+    };
+
+    // ── Render lista de pedidos ──────────────────────────────────
+    const renderPedidos = (pedidos) => {
+        const container = document.getElementById('orders-container');
+        const summaryBar = document.getElementById('summary-bar');
+
+        if (pedidos.length === 0) {
+            container.innerHTML = `
+                <div class="state-card">
+                    <i class="fas fa-box-open" style="color:#ddd"></i>
+                    <h3>Aún no has realizado ninguna compra</h3>
+                    <p>¡Explora nuestra tienda y encuentra el equipo perfecto!</p>
+                    <a href="index.html"><i class="fas fa-store"></i> Ir a la tienda</a>
+                </div>`;
+            return;
+        }
+
+        // Estadísticas
+        const pagados   = pedidos.filter(p => p.estado_pedido?.toLowerCase() === 'pagado').length;
+        const invertido = pedidos.reduce((s, p) => s + Number(p.total), 0);
+
+        document.getElementById('stat-total').textContent    = pedidos.length;
+        document.getElementById('stat-pagados').textContent  = pagados;
+        document.getElementById('stat-invertido').textContent = fmt(invertido);
+        summaryBar.style.display = 'flex';
+
+        // Cards
+        container.innerHTML = pedidos.map((p, idx) => `
+            <div class="order-card">
+                <div class="order-header" onclick="toggleDetalle(${idx})">
+                    <div>
+                        <div class="order-id">Pedido #${p.id}</div>
+                        <div class="order-meta">
+                            <i class="fas fa-calendar-alt"></i> ${fmtFecha(p.fecha)}
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+                        ${renderBadge(p.estado_pedido)}
+                        <span class="order-total">${fmt(p.total)}</span>
+                        <button class="btn-toggle" id="btn-${idx}">
+                            Ver detalle <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="order-details" id="detail-${idx}">
+                    <div class="details-inner">
+                        ${ (p.estado_pedido || '').toLowerCase() === 'pagado'
+                            ? `<div class="envio-banner">
+                                    <i class="fas fa-truck"></i>
+                                    <div>
+                                        <strong>¡Tu pedido está confirmado!</strong>
+                                        Su pedido será enviado de <strong>3 a 10 días hábiles</strong>.
+                                        Estará pendiente de seguimiento por parte del equipo.
+                                    </div>
+                               </div>`
+                            : `<div class="pendiente-banner">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <strong>Esperando confirmación de pago</strong>
+                                        El administrador verificará tu transferencia por
+                                        <strong>${p.metodo_pago || 'el método seleccionado'}</strong>.
+                                        Una vez confirmado, tu pedido será procesado.
+                                    </div>
+                               </div>`
+                        }
+                        ${ p.metodo_pago
+                            ? `<p class="metodo-info">
+                                   <i class="fas fa-credit-card" style="margin-right:5px"></i>
+                                   Método de pago: <strong>${p.metodo_pago}</strong>
+                               </p>`
+                            : ''
+                        }
+                        ${renderDetalles(p.detalles)}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    // ── Toggle detalle ────────────────────────────────────────────
+    window.toggleDetalle = (idx) => {
+        const detail = document.getElementById(`detail-${idx}`);
+        const btn    = document.getElementById(`btn-${idx}`);
+        detail.classList.toggle('open');
+        btn.classList.toggle('open');
+        btn.querySelector('span') && (btn.querySelector('span').textContent =
+            detail.classList.contains('open') ? 'Ocultar' : 'Ver detalle');
+    };
+
+    // ── Init ──────────────────────────────────────────────────────
+    const init = async () => {
+        // Actualizar header con sesión
+        actualizarHeaderAuth();
+
+        // Verificar sesión
+        if (!estaLogueado()) {
+            sessionStorage.setItem('redirect_after_login', window.location.href);
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const usuario = getUsuario();
+        const container = document.getElementById('orders-container');
+
+        try {
+            const res = await fetch(`${BASE_URL}/pedidos/mis-pedidos/${usuario.id}`);
+
+            if (!res.ok) throw new Error(`Error ${res.status}`);
+
+            const pedidos = await res.json();
+            renderPedidos(pedidos);
+
+        } catch (err) {
+            console.error('Error al cargar pedidos:', err);
+            container.innerHTML = `
+                <div class="state-card">
+                    <i class="fas fa-exclamation-triangle" style="color:#ffc107"></i>
+                    <h3>No pudimos cargar tus pedidos</h3>
+                    <p>${err.message}</p>
+                    <a href="index.html"><i class="fas fa-home"></i> Volver al inicio</a>
+                </div>`;
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>

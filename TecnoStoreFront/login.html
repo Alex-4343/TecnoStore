@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecnoStore – Iniciar Sesión</title>
+    <meta name="description" content="Inicia sesión o crea tu cuenta en TecnoStore para comprar los mejores productos tecnológicos.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue:      #007bff;
+            --blue-dark: #0056b3;
+            --green:     #28a745;
+            --red:       #dc3545;
+            --gray-50:   #f8f9fa;
+            --gray-200:  #e9ecef;
+            --gray-400:  #ced4da;
+            --gray-600:  #6c757d;
+            --gray-800:  #343a40;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,.08);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,.14);
+            --radius:    12px;
+            --transition: .22s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            padding: 20px;
+        }
+
+        /* ── Partículas decorativas de fondo ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(0,123,255,.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(40,167,69,.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* ── Tarjeta principal ── */
+        .auth-card {
+            background: rgba(255,255,255,.97);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,.1);
+            width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+            animation: fadeUp .4s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Logo / Header de la card ── */
+        .auth-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            padding: 36px 40px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-header::after {
+            content: '';
+            position: absolute;
+            bottom: -24px; left: 50%;
+            transform: translateX(-50%);
+            width: 56px; height: 56px;
+            background: rgba(255,255,255,.97);
+            border-radius: 50%;
+            box-shadow: 0 4px 16px rgba(0,0,0,.15);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .auth-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .auth-logo span { color: rgba(255,255,255,.7); }
+
+        .auth-tagline {
+            color: rgba(255,255,255,.8);
+            font-size: .9rem;
+            font-weight: 400;
+        }
+
+        /* ── Tabs login / registro ── */
+        .auth-tabs {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            margin-top: 2px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+            background: #fff;
+        }
+
+        .tab-btn:hover:not(.active) { color: var(--blue-dark); }
+
+        /* ── Formularios ── */
+        .auth-body { padding: 32px 40px 36px; }
+
+        .auth-form { display: none; }
+        .auth-form.active { display: block; animation: fadeIn .25s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: .875rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-600);
+            font-size: .9rem;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            border: 1.5px solid var(--gray-400);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: .95rem;
+            color: var(--gray-800);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            background: #fff;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px rgba(0,123,255,.12);
+        }
+
+        .input-wrapper input.error {
+            border-color: var(--red);
+            box-shadow: 0 0 0 4px rgba(220,53,69,.1);
+        }
+
+        /* Toggle contraseña */
+        .toggle-pass {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            font-size: .9rem;
+            padding: 4px;
+            transition: color var(--transition);
+        }
+
+        .toggle-pass:hover { color: var(--blue); }
+
+        /* Mensaje de error */
+        .error-msg {
+            display: none;
+            color: var(--red);
+            font-size: .8rem;
+            margin-top: 6px;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .error-msg.show { display: flex; }
+
+        /* Alerta global */
+        .auth-alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: .875rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .auth-alert.show { display: flex; }
+        .auth-alert.error   { background: #fff5f5; color: #c0392b; border: 1px solid #ffc1c1; }
+        .auth-alert.success { background: #f0fff4; color: #1e8449; border: 1px solid #b2f7c1; }
+
+        /* Botón principal */
+        .btn-auth {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            letter-spacing: .3px;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,123,255,.35);
+        }
+
+        .btn-auth:active { transform: scale(.98); }
+        .btn-auth:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+
+        /* Spinner */
+        .spinner {
+            width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Separador */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0;
+            color: var(--gray-600);
+            font-size: .8rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        /* Link de cambio de tab */
+        .switch-tab {
+            text-align: center;
+            font-size: .875rem;
+            color: var(--gray-600);
+            margin-top: 20px;
+        }
+
+        .switch-tab a {
+            color: var(--blue);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .switch-tab a:hover { text-decoration: underline; }
+
+        /* Link volver */
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 18px;
+            font-size: .85rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .back-link:hover { color: var(--blue); }
+
+        /* Responsive */
+        @media (max-width: 540px) {
+            .auth-header { padding: 28px 24px 22px; }
+            .auth-body   { padding: 24px 24px 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+
+    <!-- Header -->
+    <div class="auth-header">
+        <div class="auth-logo">TECNO<span>STORE</span></div>
+        <p class="auth-tagline">Tu tienda de tecnología de confianza</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">
+            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+        </button>
+        <button class="tab-btn" id="tab-register" onclick="switchTab('register')">
+            <i class="fas fa-user-plus"></i> Registrarse
+        </button>
+    </div>
+
+    <!-- Body -->
+    <div class="auth-body">
+
+        <!-- ── Formulario LOGIN ── -->
+        <form class="auth-form active" id="form-login" novalidate>
+            <div class="auth-alert" id="alert-login"></div>
+
+            <div class="form-group">
+                <label for="login-correo">Correo electrónico</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="login-correo" placeholder="tu@correo.com" autocomplete="email" required>
+                </div>
+                <span class="error-msg" id="err-login-correo"><i class="fas fa-exclamation-circle"></i> Ingresa un correo válido</span>
+            </div>
+
+            <div class="form-group">
+                <label for="login-pass">Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="login-pass" placeholder="Tu contraseña" autocomplete="current-password" required>
+                </div>
+                <span class="error-msg" id="err-login-pass"><i class="fas fa-exclamation-circle"></i> Ingresa tu contraseña</span>
+            </div>
+
+            <button type="submit" class="btn-auth" id="btn-login">
+                <span class="spinner" id="spin-login"></span>
+                <i class="fas fa-sign-in-alt" id="icon-login"></i>
+                <span id="text-login">Iniciar Sesión</span>
+            </button>
+
+            <p class="switch-tab">
+                ¿No tienes cuenta? <a onclick="switchTab('register')">Regístrate gratis</a>
+            </p>
+        </form>
+
+        <!-- ── Formulario REGISTRO ── -->
+        <form class="auth-form" id="form-register" novalidate>
+            <div class="auth-alert" id="alert-register"></div>
+
+            <div class="form-group">
+                <label for="reg-nombre">Nombre completo</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="reg-nombre" placeholder="Juan Pérez" autocomplete="name" required>
+                </div>
+                <span class="error-msg" id="err-reg-nombre"><i class="fas fa-exclamation-circle"></i> El nombre es requerido</span>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-correo">Correo electrónico</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="reg-correo" placeholder="tu@correo.com" autocomplete="email" required>
+                </div>
+                <span class="error-msg" id="err-reg-correo"><i class="fas fa-exclamation-circle"></i> Ingresa un correo válido</span>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-pass">Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required minlength="6">
+                </div>
+                <span class="error-msg" id="err-reg-pass"><i class="fas fa-exclamation-circle"></i> Mínimo 6 caracteres</span>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-telefono">Teléfono <span style="color:var(--gray-600);font-weight:400">(opcional)</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="reg-telefono" placeholder="300 123 4567" autocomplete="tel">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="reg-direccion">Dirección de entrega <span style="color:var(--gray-600);font-weight:400">(opcional)</span></label>
+                <div class="input-wrapper">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="reg-direccion" placeholder="Calle 123 # 45-67, Ciudad" autocomplete="street-address">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-auth" id="btn-register">
+                <span class="spinner" id="spin-register"></span>
+                <i class="fas fa-user-plus" id="icon-register"></i>
+                <span id="text-register">Crear Cuenta</span>
+            </button>
+
+            <p class="switch-tab">
+                ¿Ya tienes cuenta? <a onclick="switchTab('login')">Inicia sesión</a>
+            </p>
+        </form>
+
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Volver a la tienda
+        </a>
+    </div>
+</div>
+
+<script type="module">
+    import { login, register, estaLogueado } from './js/modules/auth.js';
+
+    // Si ya está logueado, redirigir
+    if (estaLogueado()) {
+        const redirect = sessionStorage.getItem('redirect_after_login') || 'index.html';
+        sessionStorage.removeItem('redirect_after_login');
+        window.location.href = redirect;
+    }
+
+    // ── Cambiar tab ──────────────────────────────────────────
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.getElementById(`form-${tab}`).classList.add('active');
+        clearAlerts();
+    };
+
+    // ── Toggle contraseña ────────────────────────────────────
+    document.querySelectorAll('.toggle-pass').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const input = document.getElementById(btn.dataset.target);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+    });
+
+    // ── Helpers UI ───────────────────────────────────────────
+    const setLoading = (form, loading) => {
+        const btn     = document.getElementById(`btn-${form}`);
+        const spinner = document.getElementById(`spin-${form}`);
+        const icon    = document.getElementById(`icon-${form}`);
+        const text    = document.getElementById(`text-${form}`);
+        btn.disabled  = loading;
+        spinner.style.display = loading ? 'block' : 'none';
+        icon.style.display    = loading ? 'none'  : 'inline';
+        text.textContent = loading
+            ? (form === 'login' ? 'Iniciando...' : 'Creando cuenta...')
+            : (form === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta');
+    };
+
+    const showAlert = (form, type, msg) => {
+        const el = document.getElementById(`alert-${form}`);
+        el.className = `auth-alert ${type} show`;
+        el.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${msg}`;
+    };
+
+    const clearAlerts = () => {
+        document.querySelectorAll('.auth-alert').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
+        document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+    };
+
+    const fieldError = (fieldId, errId) => {
+        document.getElementById(fieldId).classList.add('error');
+        document.getElementById(errId).classList.add('show');
+    };
+
+    const redirigir = () => {
+        const redirect = sessionStorage.getItem('redirect_after_login') || 'index.html';
+        sessionStorage.removeItem('redirect_after_login');
+        window.location.href = redirect;
+    };
+
+    // ── LOGIN ────────────────────────────────────────────────
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlerts();
+
+        const correo   = document.getElementById('login-correo').value.trim();
+        const contrasena = document.getElementById('login-pass').value;
+
+        let valido = true;
+        if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            fieldError('login-correo', 'err-login-correo');
+            valido = false;
+        }
+        if (!contrasena) {
+            fieldError('login-pass', 'err-login-pass');
+            valido = false;
+        }
+        if (!valido) return;
+
+        setLoading('login', true);
+        try {
+            await login(correo, contrasena);
+            showAlert('login', 'success', '¡Sesión iniciada! Redirigiendo...');
+            setTimeout(redirigir, 900);
+        } catch (err) {
+            showAlert('login', 'error', err.message);
+        } finally {
+            setLoading('login', false);
+        }
+    });
+
+    // ── REGISTRO ─────────────────────────────────────────────
+    document.getElementById('form-register').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearAlerts();
+
+        const nombre    = document.getElementById('reg-nombre').value.trim();
+        const correo    = document.getElementById('reg-correo').value.trim();
+        const contrasena = document.getElementById('reg-pass').value;
+        const telefono  = document.getElementById('reg-telefono').value.trim();
+        const direccion = document.getElementById('reg-direccion').value.trim();
+
+        let valido = true;
+        if (!nombre) {
+            fieldError('reg-nombre', 'err-reg-nombre');
+            valido = false;
+        }
+        if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+            fieldError('reg-correo', 'err-reg-correo');
+            valido = false;
+        }
+        if (!contrasena || contrasena.length < 6) {
+            fieldError('reg-pass', 'err-reg-pass');
+            valido = false;
+        }
+        if (!valido) return;
+
+        setLoading('register', true);
+        try {
+            await register(nombre, correo, contrasena, telefono, direccion);
+            showAlert('register', 'success', '¡Cuenta creada! Redirigiendo...');
+            setTimeout(redirigir, 900);
+        } catch (err) {
+            showAlert('register', 'error', err.message);
+        } finally {
+            setLoading('register', false);
+        }
+    });
+</script>
+
+</body>
+</html>

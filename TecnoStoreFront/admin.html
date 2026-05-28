@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador - TecnoStore</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🛍️ TecnoStore Admin</h1>
+            </div>
+            <nav class="admin-nav">
+                <button class="nav-btn active" data-section="dashboard">📊 Dashboard</button>
+                <button class="nav-btn" data-section="productos">📦 Productos</button>
+                <button class="nav-btn" data-section="proveedores">🚚 Proveedores</button>
+                <button class="nav-btn" data-section="kardex">📋 Kardex</button>
+                <button class="nav-btn" data-section="pedidos">📦 Pedidos</button>
+                <button class="nav-btn" data-section="lotes">🗂 Lotes FIFO</button>
+                <button class="nav-btn" data-section="reportes">📈 Reportes</button>
+            </nav>
+            <div class="user-info">
+                <button id="logout-btn" class="logout-btn">Salir</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <!-- ===== DASHBOARD ===== -->
+        <section id="dashboard" class="admin-section active">
+            <div class="section-title">
+                <h2>📊 Dashboard Financiero</h2>
+                <p>Visualiza la salud de tu negocio</p>
+            </div>
+
+            <!-- Indicadores Principales -->
+            <div class="indicators-container">
+                <div class="indicator-card">
+                    <div class="indicator-icon">💰</div>
+                    <div class="indicator-content">
+                        <p class="indicator-label">Inversión Total</p>
+                        <p class="indicator-value" id="inversion-total">$0.00</p>
+                        <p class="indicator-subtitle">En mercancía</p>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-icon">📈</div>
+                    <div class="indicator-content">
+                        <p class="indicator-label">Venta Potencial</p>
+                        <p class="indicator-value" id="venta-potencial">$0.00</p>
+                        <p class="indicator-subtitle">Si vendes todo</p>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-icon">🎯</div>
+                    <div class="indicator-content">
+                        <p class="indicator-label">Ganancia Estimada</p>
+                        <p class="indicator-value" id="ganancia-proyectada">$0.00</p>
+                        <p class="indicator-subtitle">Utilidad bruta</p>
+                    </div>
+                </div>
+
+                <div class="indicator-card">
+                    <div class="indicator-icon">📦</div>
+                    <div class="indicator-content">
+                        <p class="indicator-label">Total de Productos</p>
+                        <p class="indicator-value" id="total-productos">0</p>
+                        <p class="indicator-subtitle">Activos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de Ventas últimos 30 días -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h3>📊 Resumen de Ventas (Últimos 30 días)</h3>
+                    <div class="sales-grid">
+                        <div class="sales-item">
+                            <span class="label">Total Pedidos</span>
+                            <span class="value" id="total-pedidos">0</span>
+                        </div>
+                        <div class="sales-item">
+                            <span class="label">Unidades Vendidas</span>
+                            <span class="value" id="total-unidades">0</span>
+                        </div>
+                        <div class="sales-item">
+                            <span class="label">Total Vendido</span>
+                            <span class="value" id="total-vendido">$0.00</span>
+                        </div>
+                        <div class="sales-item">
+                            <span class="label">Ganancia Real</span>
+                            <span class="value" id="ganancia-real">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Productos -->
+            <div class="dashboard-row">
+                <div class="dashboard-card full-width">
+                    <h3>🏆 Top 5 Productos Más Vendidos</h3>
+                    <div id="top-products-container" class="products-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== GESTIÓN DE PROVEEDORES ===== -->
+        <section id="proveedores" class="admin-section">
+            <div class="section-title">
+                <h2>🚚 Gestión de Proveedores</h2>
+                <button id="btn-new-proveedor" class="btn btn-primary">➕ Nuevo Proveedor</button>
+            </div>
+
+            <!-- Tabla de Proveedores -->
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Contacto</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="proveedores-tbody">
+                        <tr class="loading">
+                            <td colspan="6">Cargando proveedores...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal para Proveedor -->
+            <div id="proveedor-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-proveedor-title">Nuevo Proveedor</h3>
+                        <button class="modal-close"
+                            onclick="this.closest('.modal').classList.add('hidden')">&times;</button>
+                    </div>
+                    <form id="proveedor-form">
+                        <div class="form-group">
+                            <label>Nombre del Proveedor *</label>
+                            <input type="text" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contacto</label>
+                            <input type="text" name="contacto">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Teléfono</label>
+                                <input type="text" name="telefono">
+                            </div>
+                            <div class="form-group">
+                                <label>Correo</label>
+                                <input type="email" name="correo">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="this.closest('.modal').classList.add('hidden')">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== GESTIÓN DE PRODUCTOS ===== -->
+        <section id="productos" class="admin-section">
+            <div class="section-title">
+                <h2>📦 Gestión de Inventario</h2>
+                <button id="btn-new-product" class="btn btn-primary">➕ Nuevo Producto</button>
+            </div>
+
+            <!-- Tabla de Productos -->
+            <div class="table-container">
+                <table class="products-table" id="productos-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Precio Compra</th>
+                            <th>Precio Venta</th>
+                            <th>Margen</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productos-tbody">
+                        <tr class="loading">
+                            <td colspan="8">Cargando productos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal para crear/editar producto -->
+            <div id="product-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="modal-title">Nuevo Producto</h3>
+                        <button class="modal-close"
+                            onclick="this.closest('.modal').classList.add('hidden')">&times;</button>
+                    </div>
+                    <form id="product-form">
+                        <div class="form-group">
+                            <label>Nombre del Producto *</label>
+                            <input type="text" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción</label>
+                            <textarea name="descripcion"></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Categoría *</label>
+                                <select name="id_categoria" id="categoria-select" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Proveedor *</label>
+                                <select name="id_proveedor" id="proveedor-select" required></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>URL de Imagen</label>
+                            <input type="url" name="imagen_url">
+                        </div>
+                        <!--
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Precio de Compra (costo) *</label>
+                                <input type="number" name="precio_compra" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio de Venta *</label>
+                                <input type="number" name="precio_venta" step="0.01" required>
+                            </div>
+                        </div>
+                        -->
+                        <!-- <div class="form-group">
+                            <label>Stock Inicial *</label>
+                            <input type="number" name="stock" step="1" required>
+                        </div> -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">💾 Guardar</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="this.closest('.modal').classList.add('hidden')">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal para reabastecer stock -->
+            <div id="restock-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Reabastecer Stock</h3>
+                        <button class="modal-close"
+                            onclick="this.closest('.modal').classList.add('hidden')">&times;</button>
+                    </div>
+                    <form id="restock-form">
+                        <input type="hidden" id="restock-product-id">
+                        <div class="form-group">
+                            <label>Producto</label>
+                            <input type="text" id="restock-product-name" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock Actual</label>
+                            <input type="number" id="restock-current" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>💰 Precio de Compra del Lote (por unidad) *</label>
+                            <input type="number" name="precio_compra_lote" step="1" min="1" placeholder="Ej: 85000"
+                                required>
+                            <small style="color:#888;font-size:.8rem;display:block;margin-top:4px">
+                                Costo al que compraste este nuevo lote al proveedor
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label>Cantidad a Agregar *</label>
+                            <input type="number" name="cantidad" step="1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripción del Movimiento</label>
+                            <input type="text" name="descripcion" placeholder="Ej: Compra a proveedor">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">✅ Confirmar</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="this.closest('.modal').classList.add('hidden')">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== PEDIDOS ===== -->
+        <section id="pedidos" class="admin-section">
+            <div class="section-title">
+                <h2>📦 Gestión de Pedidos</h2>
+                <p style="color:#888;font-size:.88rem">Confirma los pagos recibidos para activar los pedidos</p>
+            </div>
+
+            <!-- Filtro de estado -->
+            <div class="filter-container" style="margin-bottom:16px">
+                <select id="pedidos-estado-filter" class="filter-select" onchange="admin.loadPedidos()">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente" selected>⏳ Pendientes</option>
+                    <option value="pagado">✅ Pagados</option>
+                </select>
+            </div>
+
+            <!-- Tabla de Pedidos -->
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Método Pago</th>
+                            <th>Total</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pedidos-tbody">
+                        <tr class="loading">
+                            <td colspan="7">Cargando pedidos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Modal Detalles Pedido -->
+        <div id="pedido-detalle-modal" class="modal hidden">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3 id="modal-pedido-title">Detalles del Pedido</h3>
+                    <button class="modal-close"
+                        onclick="this.closest('.modal').classList.add('hidden')">&times;</button>
+                </div>
+                <div id="pedido-detalle-body" style="padding: 10px 0;">
+                    <!-- Los detalles del pedido se inyectarán aquí -->
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="this.closest('.modal').classList.add('hidden')">Cerrar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LOTES FIFO ===== -->
+        <section id="lotes" class="admin-section">
+            <div class="section-title">
+                <h2>🗂 Lotes de Inventario (FIFO / PEPS)</h2>
+                <p style="color:#888;font-size:.88rem">Las ventas consumen el lote más antiguo primero</p>
+            </div>
+
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Proveedor</th>
+                            <th>Cant. Inicial</th>
+                            <th>Disponible</th>
+                            <th>Costo/ud.</th>
+                            <th>Valor Lote</th>
+                            <th>Fecha Entrada</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lotes-tbody">
+                        <tr class="loading">
+                            <td colspan="9">Cargando lotes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== KARDEX ===== -->
+        <section id="kardex" class="admin-section">
+            <div class="section-title">
+                <h2>📋 Kardex (Historial de Movimientos)</h2>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filter-container">
+                <select id="kardex-product-filter" class="filter-select">
+                    <option value="">📦 Todos los productos</option>
+                </select>
+            </div>
+
+            <!-- Tabla de Kardex -->
+            <div class="table-container">
+                <table class="kardex-table" id="kardex-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Tipo de Movimiento</th>
+                            <th>Cantidad</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kardex-tbody">
+                        <tr class="loading">
+                            <td colspan="5">Cargando historial...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ===== REPORTES ===== -->
+        <section id="reportes" class="admin-section">
+            <div class="section-title">
+                <h2>📈 Reportes</h2>
+            </div>
+
+            <!-- Reportes Disponibles -->
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3>⚠️ Productos con Bajo Stock</h3>
+                    <p>Productos que necesitan reabastecimiento</p>
+                    <button class="btn btn-secondary" onclick="loadLowStockReport()">Ver Reporte</button>
+                    <div id="low-stock-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>💹 Rentabilidad por Producto</h3>
+                    <p>Análisis de margen de ganancia</p>
+                    <button class="btn btn-secondary" onclick="loadProfitabilityReport()">Ver Reporte</button>
+                    <div id="profitability-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>📊 Resumen de Kardex</h3>
+                    <p>Movimientos de inventario por producto</p>
+                    <button class="btn btn-secondary" onclick="loadKardexResumen()">Ver Reporte</button>
+                    <div id="kardex-resumen-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>📊 Cliente Estrella (Top Buyer)</h3>
+                    <p>Clientes con mayor inversión y pedidos completados</p>
+                    <div class="filter-group-inline" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="top-buyers-period" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="top-buyers-period" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="top-buyers-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="top-buyers-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="top-buyers-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadTopBuyersReport()">Ver Reporte</button>
+                    <div id="top-buyers-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>🏆 Producto Más Vendido (Best Seller)</h3>
+                    <p>Productos con mayor rotación e ingresos generados</p>
+                    <div class="filter-group-inline" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="best-seller-period" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="best-seller-period" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="best-seller-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="best-seller-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="best-seller-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadBestSellersReport()">Ver Reporte</button>
+                    <div id="best-sellers-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>📅 Ventas Consolidadas (FIFO)</h3>
+                    <p>Total facturado y ganancia neta real en un período</p>
+                    <div class="filter-group-inline"
+                        style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="sales-period"
+                            style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="sales-period"
+                            style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="sales-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="sales-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="sales-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadSalesConsolidatedReport()">Ver Reporte</button>
+                    <div id="sales-consolidated-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>🚚 Desempeño de Proveedores</h3>
+                    <p>Eficiencia financiera e inversión por proveedor</p>
+                    <div class="filter-group-inline" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="providers-period" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="providers-period" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="providers-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="providers-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="providers-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadProvidersPerformanceReport()">Ver Reporte</button>
+                    <div id="providers-performance-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>💳 Métodos de Pago más Utilizados</h3>
+                    <p>Transacciones y monto total por pasarela de pago</p>
+                    <button class="btn btn-secondary" onclick="loadPaymentMethodsReport()">Ver Reporte</button>
+                    <div id="payment-methods-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>🛒 Cliente con mayor compra por producto</h3>
+                    <p>Quién compra más unidades de cada producto (mouse, teclados, etc.)</p>
+                    <div class="filter-group-inline" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="top-buyers-prod-period" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="top-buyers-prod-period" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="top-buyers-prod-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="top-buyers-prod-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="top-buyers-prod-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadTopBuyersPerProductReport()">Ver Reporte</button>
+                    <div id="top-buyers-per-product-container" class="report-content hidden"></div>
+                </div>
+
+                <div class="report-card">
+                    <h3>🗂 Información de Lotes Compra</h3>
+                    <p>Reporte de lotes incluyendo los ya vendidos en una fecha específica</p>
+                    <div class="filter-group-inline" style="margin-bottom: 12px; display: flex; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="lotes-info-period" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Período:</label>
+                        <select id="lotes-info-period" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                            <option value="dia">Hoy</option>
+                            <option value="semana">Últimos 7 días</option>
+                            <option value="mes">Últimos 30 días</option>
+                            <option value="ano">Último año</option>
+                            <option value="especifico">Día específico</option>
+                        </select>
+                    </div>
+                    <div id="lotes-info-date-container" class="filter-group-inline hidden" style="margin-bottom: 12px; display: none; justify-content: center; gap: 8px; align-items: center;">
+                        <label for="lotes-info-date" style="font-size: 0.9rem; font-weight: 600; color: #1a1a2e;">Fecha:</label>
+                        <input type="date" id="lotes-info-date" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; background: white; cursor: pointer;">
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadLotesInfoReport()">Ver Reporte</button>
+                    <div id="lotes-info-container" class="report-content hidden"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="js/modules/api.js"></script>
+    <script src="js/modules/auth.js"></script>
+    <script src="js/modules/admin.js"></script>
+</body>
+
+</html>

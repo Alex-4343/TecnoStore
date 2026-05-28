@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecnoStore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/reset.css">
+
+
+</head>
+<body>
+<header class="site-header">
+    <div class="top-bar">
+        <p>Compra  <strong>con nosotros </strong>para más seguridad</p>
+    </div>
+
+    <div class="main-header">
+        <div class="logo">
+            <h2>TECNO<span class="logo-accent">STORE</span></h2>
+        </div>
+
+        <nav class="main-nav">
+            <ul>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" id="categoriesDropdown">
+                        Categorías <i class="fas fa-chevron-down" style="font-size: 0.8em;"></i>
+                    </a>
+                    <ul class="dropdown-menu" id="categoriesMenu">
+                        <li><a href="#" data-category="all">Todos</a></li>
+                        <li><a href="#" data-category="1">Portátiles</a></li>
+                        <li><a href="#" data-category="2">PCs de Escritorio</a></li>
+                        <li><a href="#" data-category="3">Periféricos</a></li>
+                    </ul>
+                </li>
+                <li><a href="mis-pedidos.html">Mis Pedidos</a></li>
+                <li><a href="https://wa.me/573000000000" target="_blank" title="Chatea con nosotros">Contáctanos</a></li>
+                <li><a href="#" data-bs-toggle="modal" data-bs-target="#howToBuyModal">¿Cómo comprar?</a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <div class="search-box">
+                <input type="text" placeholder="¿Qué estás buscando?">
+                <button type="button"><i class="fas fa-search"></i></button>
+            </div>
+            
+            <div class="user-icons">
+                <a href="#" title="Mi Cuenta"><i class="far fa-user"></i></a>
+                <a href="#" class="cart-link" title="Carrito">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-counter">0</span> 
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Side Drawer del Carrito -->
+<div class="cart-drawer">
+    <div class="cart-drawer-header">
+        <h2>Tu Carrito</h2>
+        <button class="cart-drawer-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="cart-items-container"></div>
+    
+    <div class="cart-drawer-footer">
+        <div class="cart-warning" style="display:none;padding:10px 14px;margin:8px 12px;border-radius:6px;background:#fff3cd;border:1px solid #ffe8a8;color:#7a4d00;font-weight:600;font-size:.95rem"></div>
+        <div class="cart-summary">
+            <span>Total:</span>
+            <span class="cart-total">$0</span>
+        </div>
+        <button class="btn-checkout">
+            <i class="fas fa-credit-card"></i> Finalizar Compra
+        </button>
+    </div>
+</div>
+
+<!-- Overlay para cerrar el drawer -->
+<div class="cart-drawer-overlay"></div>
+
+    <div id="products-container"></div>
+
+    <!-- ===== MODAL DE DETALLE DE PRODUCTO ===== -->
+    <div id="modal-detalle-overlay" class="pd-overlay"></div>
+    <div id="modal-detalle" class="pd-modal" role="dialog" aria-modal="true" aria-labelledby="pd-modal-title">
+        <button id="modal-detalle-close" class="pd-modal-close" title="Cerrar">
+            <i class="fas fa-times"></i>
+        </button>
+        <div id="modal-detalle-body" class="pd-modal-body"></div>
+    </div>
+
+    <!-- ===== MODAL CÓMO COMPRAR ===== -->
+    <div class="modal fade" id="howToBuyModal" tabindex="-1" aria-labelledby="howToBuyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="howToBuyModalLabel"><i class="fas fa-info-circle text-primary me-2"></i> ¿Cómo comprar en TecnoStore?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid py-2">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-search fa-2x text-primary me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold">1. Encuentra tus productos</h6>
+                                <p class="text-muted small mb-0">Navega por nuestras categorías o utiliza el buscador en la parte superior para encontrar el equipo ideal.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-cart-plus fa-2x text-primary me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold">2. Agrega al carrito</h6>
+                                <p class="text-muted small mb-0">Haz clic en "Agregar" en el producto que deseas. Revisa tu lista desde el ícono en la esquina superior derecha.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-credit-card fa-2x text-primary me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold">3. Finaliza tu compra</h6>
+                                <p class="text-muted small mb-0">Abre tu carrito y presiona "Finalizar Compra". Completa tus datos y selecciona tu método de pago preferido.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-truck fa-2x text-primary me-3 mt-1"></i>
+                            <div>
+                                <h6 class="fw-bold">4. Recibe tu pedido</h6>
+                                <p class="text-muted small mb-0">Una vez confirmado el pago, procesaremos tu envío. Te notificaremos para que puedas rastrearlo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Entendido</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+
+</html>
