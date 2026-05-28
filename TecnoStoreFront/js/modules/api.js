@@ -1,5 +1,5 @@
-// URL base de tu backend de TecnoStore
-export const BASE_URL = 'http://localhost:3000/api';
+// URL base de tu backend de TecnoStore (reemplaza por la URL real de Render)
+export const BASE_URL = 'https://tecnostore-3opr.onrender.com/api';
 
 /**
  * Obtiene todos los productos desde el Backend
