@@ -3,7 +3,7 @@
  * Maneja sesión de usuario en localStorage
  */
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://tecnostore-3opr.onrender.com/api';
 const SESSION_KEY = 'tecnostore_usuario';
 
 // ─── Sesión ───────────────────────────────────────────────

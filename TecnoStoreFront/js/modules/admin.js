@@ -5,12 +5,12 @@
 
 const API = {
     get: async (endpoint) => {
-        const res = await fetch(`http://localhost:3000/api${endpoint}`);
+        const res = await fetch(`https://tecnostore-3opr.onrender.com/api${endpoint}`);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();
     },
     post: async (endpoint, data) => {
-        const res = await fetch(`http://localhost:3000/api${endpoint}`, {
+        const res = await fetch(`https://tecnostore-3opr.onrender.com/api${endpoint}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -19,7 +19,7 @@ const API = {
         return res.json();
     },
     put: async (endpoint, data) => {
-        const res = await fetch(`http://localhost:3000/api${endpoint}`, {
+        const res = await fetch(`https://tecnostore-3opr.onrender.com/api${endpoint}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -28,7 +28,7 @@ const API = {
         return res.json();
     },
     patch: async (endpoint, data) => {
-        const res = await fetch(`http://localhost:3000/api${endpoint}`, {
+        const res = await fetch(`https://tecnostore-3opr.onrender.com/api${endpoint}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -37,7 +37,7 @@ const API = {
         return res.json();
     },
     delete: async (endpoint) => {
-        const res = await fetch(`http://localhost:3000/api${endpoint}`, {
+        const res = await fetch(`https://tecnostore-3opr.onrender.com/api${endpoint}`, {
             method: 'DELETE'
         });
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);

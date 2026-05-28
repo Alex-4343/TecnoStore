@@ -5,7 +5,7 @@
 
 import { getCarrito, vaciarCarrito, limpiarCarrito, prepararCarritoParaPedido } from './cart.js';
 
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'https://tecnostore-3opr.onrender.com/api';
 
 /**
  * Finaliza la compra enviando carrito + usuario al endpoint transaccional.
