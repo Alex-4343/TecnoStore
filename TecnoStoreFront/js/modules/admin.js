@@ -1392,8 +1392,9 @@ class AdminModule {
     }
 }
 
-// Crear instancia global
+// Crear instancia global (window.admin para que los onclick del HTML puedan acceder)
 const admin = new AdminModule();
+window.admin = admin;
 
 // Event listeners para reportes
 window.loadLowStockReport = () => admin.loadLowStockReport();
