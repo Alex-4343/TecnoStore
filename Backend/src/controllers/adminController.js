@@ -304,7 +304,7 @@ class AdminController {
             const { id } = req.params;
             
             const [result] = await pool.promise().query(
-                'UPDATE Productos SET estado = "inactivo" WHERE id = ?',
+                `UPDATE Productos SET estado = 'inactivo' WHERE id = ?`,
                 [id]
             );
             
