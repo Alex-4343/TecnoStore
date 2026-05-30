@@ -1,6 +1,9 @@
 const mysql = require('mysql2');
 
 // Crear el pool de conexiones con soporte opcional de SSL (p.ej. Aiven requiere SSL)
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_NAME:', process.env.DB_NAME);
+
 const poolConfig = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
