@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config(); // <-- Esto activa tu archivo .env
+require('dotenv').config({ override: false }); // <-- Esto activa tu archivo .env
 require('./src/config/db.js'); // <-- Importar la configuración de la base de datos
 
 const app = express();
